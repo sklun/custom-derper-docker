@@ -10,10 +10,17 @@ services:
       - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock # DERP_VERIFY_CLIENTS true 时容器需要访问 Tailscale 的 Local API
     ports:
       - 443:443 # DERP TLS 端口
-      - 3478:3478/udp # STUN UDP端口
-    environment:
-      - DERP_DOMAIN=<domain/ip> # 替换为你的域名或IP
-      - DERP_CERT_DIR=/app/certs # 证书目录
-      - DERP_CERT_MODE=manual # 使用手动模式
-      - DERP_VERIFY_CLIENTS=true # 仅允许Tailscale授权节点
-      - DERP_HTTP_PORT=-1 # 禁用HTTP
+      - ${DERP_STUN_PORT:-3478}:${DERP_STUN_PORT:-3478}/udp # STUN UDP端口
+    env_file:
+      - .env
+    command:
+      - /app/derper
+      - --hostname=${DERP_DOMAIN}
+      - --a=${DERP_ADDR}
+      - --http-port=${DERP_HTTP_PORT}
+      - --certmode=${DERP_CERT_MODE}
+      - --certdir=${DERP_CERT_DIR}
+      - --stun=${DERP_STUN}
+      - --stun-port=${DERP_STUN_PORT}
+      - --verify-clients=${DERP_VERIFY_CLIENTS}
+      - --verify-client-url=${DERP_VERIFY_CLIENT_URL}
