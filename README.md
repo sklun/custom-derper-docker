@@ -59,6 +59,7 @@ docker compose up -d
 
 | ENV | 必须 | 描述 | 默认值 |
 | --- | ---- | ---- | ------ |
+| TZ | 否 | 容器时区，例如 `Asia/Shanghai` | Asia/Shanghai |
 | DERP_DOMAIN | 是 | DERP 服务器域名或 IP | |
 | DERP_ADDR | 否 | DERP 服务端口，只填写端口号，不要带 `:` | 443 |
 | DERP_HTTP_PORT | 否 | HTTP 服务端口（-1 禁用） | -1 |

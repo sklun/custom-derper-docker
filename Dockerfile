@@ -19,9 +19,7 @@ ENV DERP_VERIFY_CLIENT_URL=""
 
 COPY --from=builder /go/bin/derper .
 
-RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "Asia/Shanghai" > /etc/timezone && apk del tzdata \
-    && apk add ca-certificates \
+RUN apk add --no-cache ca-certificates tzdata \
     && mkdir /app/certs
 
 CMD ["/bin/sh", "-c", "/app/derper --hostname=$DERP_DOMAIN --a=:$DERP_ADDR --http-port=$DERP_HTTP_PORT --certmode=$DERP_CERT_MODE --certdir=$DERP_CERT_DIR --stun=$DERP_STUN --stun-port=$DERP_STUN_PORT --verify-clients=$DERP_VERIFY_CLIENTS --verify-client-url=$DERP_VERIFY_CLIENT_URL"]
