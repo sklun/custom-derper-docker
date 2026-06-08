@@ -60,7 +60,7 @@ docker compose up -d
 | ENV | 必须 | 描述 | 默认值 |
 | --- | ---- | ---- | ------ |
 | DERP_DOMAIN | 是 | DERP 服务器域名或 IP | |
-| DERP_ADDR | 否 | DERP 服务器监听地址 | :443 |
+| DERP_ADDR | 否 | DERP 服务端口，只填写端口号，不要带 `:` | 443 |
 | DERP_HTTP_PORT | 否 | HTTP 服务端口（-1 禁用） | -1 |
 | DERP_CERT_MODE | 否 | 获取证书的模式，可选值：letsencrypt, manual | manual |
 | DERP_CERT_DIR | 否 | 证书存放目录 | /app/certs |
@@ -170,6 +170,7 @@ DERP_VERIFY_CLIENTS=true
             "Name": "customderp1",
             "HostName": "your-domain.com",  // 替换为你的域名或IP
             "IPv4": "1.2.3.4",              // 替换为你的服务器IP
+            // "DERPPort": 8443,            // 非 443 端口时设置为 DERP_ADDR 的值
             "InsecureForTests": true        // 自签证书必须设置为 true
           }
         ]
@@ -189,8 +190,31 @@ DERP_VERIFY_CLIENTS=true
 | `Name` | DERP 节点名称 |
 | `HostName` | DERP 服务器域名或 IP（需与 DERP_DOMAIN 一致） |
 | `IPv4` | 服务器 IPv4 地址 |
+| `DERPPort` | DERP HTTPS 服务端口。默认 443；当 `.env` 中 `DERP_ADDR` 配置为非 443 端口时必须设置为相同端口号 |
 | `InsecureForTests` | 是否允许不安全连接，自签证书必须设为 `true` |
 | `OmitDefaultRegions` | 设为 `true` 将禁用 Tailscale 官方 DERP，仅使用自建服务 |
+
+#### 非标 DERP 端口
+
+如果 `.env` 中将 DERP 服务端口改为非 443，例如：
+
+```bash
+DERP_ADDR=8443
+```
+
+那么 ACL 的 `derpMap` 节点中也需要声明相同的 `DERPPort`：
+
+```json
+{
+  "Name": "customderp1",
+  "HostName": "your-domain.com",
+  "IPv4": "1.2.3.4",
+  "DERPPort": 8443,
+  "InsecureForTests": true
+}
+```
+
+注意：`DERP_ADDR` 和 `DERPPort` 都只填写端口号，不要带 `:`；`HostName` 也不要写成 `your-domain.com:8443`。
 
 **注意**：Tailscale 默认优先选择官方 DERP 节点，自建服务器可能不会被选用。解决方案：
 
